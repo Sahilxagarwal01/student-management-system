@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <div class="dashboard-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <h2>SMS<span>.dev</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="active" onclick="showPage('dashboard', this)">🏠 Dashboard</a>
+                <a href="#" onclick="showPage('students', this)">👨‍🎓 Students</a>
+                <a href="#" onclick="showPage('attendance', this)">📋 Attendance</a>
+                <a href="#" onclick="showPage('reports', this)">📊 Reports</a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Sahil Agarwal</p>
+                <span>Admin</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p>JECRC Foundation — B.Tech Dashboard</p>
+                </div>
+                <div class="top-right">
+                    <button class="print-btn" onclick="printStudents()">🖨️ Print Report</button>
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                </div>
+            </header>
+
+            <!-- PAGE 1: Dashboard -->
+            <div id="page-dashboard" class="page active">
+
+                <section class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-icon">👨‍🎓</div>
+                        <div class="stat-info">
+                            <span>Total Students</span>
+                            <h3 id="totalStudents">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span>Present Today</span>
+                            <h3 id="presentCount">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <span>Absent Today</span>
+                            <h3 id="absentCount">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <span>Fee Paid</span>
+                            <h3 id="feePaidCount">0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <span>Attendance %</span>
+                            <h3 id="attendancePercent">0%</h3>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="progress-section">
+                    <div class="progress-header">
+                        <span>Overall Attendance</span>
+                        <span id="progressLabel">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                </section>
+
+                <section class="dashboard-summary">
+                    <div class="summary-card">
+                        <h3>📋 Quick Summary</h3>
+                        <p id="summaryText">No students added yet. Go to Students page to add!</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>🏆 Top Performer</h3>
+                        <p id="topPerformer">No students yet.</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>⚠️ Fee Defaulters</h3>
+                        <p id="feeDefaulters">No students yet.</p>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- PAGE 2: Students -->
+            <div id="page-students" class="page">
+
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2>➕ Add New Student</h2>
+                    </div>
+                    <div class="student-form">
+                        <input type="text" id="studentName" placeholder="Student Name" required>
+                        <input type="text" id="studentBranch" placeholder="Branch (e.g. B.Tech CSE)">
+                        <input type="text" id="studentYear" placeholder="Year (e.g. 2nd Year)">
+                        <input type="number" id="studentMarks" placeholder="Marks (out of 100)" min="0" max="100">
+                        <input type="email" id="studentEmail" placeholder="Student Email">
+                        <button class="btn" onclick="addStudent()">+ Add Student</button>
+                    </div>
+                </section>
+
+                <section class="search-section">
+                    <div class="section-header">
+                        <h2>👨‍🎓 Student Records</h2>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="🔍 Search by name or roll number..." oninput="searchStudents()">
+                    </div>
+                </section>
+
+                <section class="table-section">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Branch</th>
+                                <th>Year</th>
+                                <th>Marks</th>
+                                <th>Grade</th>
+                                <th>Progress</th>
+                                <th>Attendance</th>
+                                <th>Fee</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody"></tbody>
+                    </table>
+                    <div class="empty-state" id="emptyState">
+                        <p>📭 No students added yet!</p>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- PAGE 3: Attendance -->
+            <div id="page-attendance" class="page">
+
+                <section class="attendance-header-section">
+                    <div class="section-header">
+                        <h2>📋 Attendance Manager</h2>
+                    </div>
+                    <div class="attendance-stats">
+                        <span class="att-stat present-stat">✅ Present: <strong id="attPresent">0</strong></span>
+                        <span class="att-stat absent-stat">❌ Absent: <strong id="attAbsent">0</strong></span>
+                    </div>
+                </section>
+
+                <section class="table-section">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Branch</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Email Alert</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody"></tbody>
+                    </table>
+                    <div class="empty-state" id="attEmptyState">
+                        <p>📭 No students added yet. Go to Students page first!</p>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- PAGE 4: Reports -->
+            <div id="page-reports" class="page">
+
+                <section class="reports-grid">
+                    <div class="report-card">
+                        <h3>📊 Class Performance</h3>
+                        <div id="gradeReport"></div>
+                    </div>
+                    <div class="report-card">
+                        <h3>💰 Fee Report</h3>
+                        <div id="feeReport"></div>
+                    </div>
+                </section>
+
+                <section class="table-section" style="margin-top: 2rem;">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>Avatar</th>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Marks</th>
+                                <th>Grade</th>
+                                <th>Progress</th>
+                                <th>Fee Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody"></tbody>
+                    </table>
+                    <div class="empty-state" id="reportsEmptyState">
+                        <p>📭 No students added yet. Go to Students page first!</p>
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem('sms_students')) || [];
+        let rollCounter = students.length > 0 ? Math.max(...students.map(s => parseInt(s.roll.replace('JECRC', '')))) : 0;
+
+        function saveStudents() {
+            localStorage.setItem('sms_students', JSON.stringify(students));
+        }
+
+        // Show Page
+        function showPage(page, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            if (el) el.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                students: 'Students',
+                attendance: 'Attendance',
+                reports: 'Reports'
+            };
+            document.getElementById('pageTitle').textContent = titles[page];
+
+            if (page === 'attendance') renderAttendanceTable();
+            if (page === 'reports') renderReportsTable();
+            if (page === 'dashboard') updateDashboardSummary();
+        }
+
+        // Notification
+        function showNotification(message, type) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification show ${type}`;
+            setTimeout(() => { notif.className = 'notification'; }, 3000);
+        }
+
+        // Grade
+        function getGrade(marks) {
+            if (marks >= 90) return 'A+';
+            if (marks >= 80) return 'A';
+            if (marks >= 70) return 'B+';
+            if (marks >= 60) return 'B';
+            if (marks >= 50) return 'C';
+            if (marks >= 40) return 'D';
+            return 'F';
+        }
+
+        function getGradeColor(grade) {
+            if (grade === 'A+' || grade === 'A') return 'grade-a';
+            if (grade === 'B+' || grade === 'B') return 'grade-b';
+            if (grade === 'C') return 'grade-c';
+            return 'grade-f';
+        }
+
+        function getProgressColor(marks) {
+            if (marks >= 75) return 'linear-gradient(90deg, #10b981, #34d399)';
+            if (marks >= 50) return 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+            return 'linear-gradient(90deg, #ef4444, #f87171)';
+        }
+
+        function getAvatarColor(name) {
+            const colors = ['#0072ff', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+            return colors[name.charCodeAt(0) % colors.length];
+        }
+
+        // Add Student
+        function addStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const branch = document.getElementById('studentBranch').value.trim();
+            const year = document.getElementById('studentYear').value.trim();
+            const marks = parseInt(document.getElementById('studentMarks').value) || 0;
+            const email = document.getElementById('studentEmail').value.trim();
+
+            if (!name) {
+                showNotification('⚠️ Please enter Student Name!', 'error');
+                return;
+            }
+
+            rollCounter++;
+            const roll = `JECRC${String(rollCounter).padStart(3, '0')}`;
+            const today = new Date().toLocaleDateString('en-IN');
+
+            const student = {
+                id: Date.now(),
+                name, roll,
+                branch: branch || 'B.Tech CSE',
+                year: year || '1st Year',
+                marks, grade: getGrade(marks),
+                attendance: 'Present',
+                fee: 'Unpaid',
+                email: email || '',
+                joined: today
+            };
+
+            students.push(student);
+            saveStudents();
+            renderStudentTable(students);
+            updateStats();
+            showNotification(`✅ ${name} added successfully!`, 'success');
+
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentBranch').value = '';
+            document.getElementById('studentYear').value = '';
+            document.getElementById('studentMarks').value = '';
+            document.getElementById('studentEmail').value = '';
+        }
+
+        // Delete Student
+        function deleteStudent(id) {
+            const student = students.find(s => s.id === id);
+            students = students.filter(s => s.id !== id);
+            saveStudents();
+            renderStudentTable(students);
+            updateStats();
+            showNotification(`🗑️ ${student.name} removed!`, 'error');
+        }
+
+        // Toggle Attendance
+        function toggleAttendance(id) {
+            students = students.map(s => {
+                if (s.id === id) {
+                    s.attendance = s.attendance === 'Present' ? 'Absent' : 'Present';
+                    if (s.attendance === 'Absent' && s.email) {
+                        showNotification(`📧 Alert sent to ${s.name} (${s.email}) — Marked Absent!`, 'warning');
+                    } else {
+                        showNotification(`✅ ${s.name} marked ${s.attendance}!`, 'success');
+                    }
+                }
+                return s;
+            });
+            saveStudents();
+            renderStudentTable(students);
+            renderAttendanceTable();
+            updateStats();
+        }
+
+        // Toggle Fee
+        function toggleFee(id) {
+            students = students.map(s => {
+                if (s.id === id) {
+                    s.fee = s.fee === 'Paid' ? 'Unpaid' : 'Paid';
+                    showNotification(`💰 ${s.name} fee marked ${s.fee}!`, s.fee === 'Paid' ? 'success' : 'warning');
+                }
+                return s;
+            });
+            saveStudents();
+            renderStudentTable(students);
+            updateStats();
+        }
+
+        // Search
+        function searchStudents() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = students.filter(s =>
+                s.name.toLowerCase().includes(query) ||
+                s.roll.toLowerCase().includes(query)
+            );
+            renderStudentTable(filtered);
+        }
+
+        // Print
+        function printStudents() {
+            window.print();
+            showNotification('🖨️ Printing report...', 'success');
+        }
+
+        // Render Student Table
+        function renderStudentTable(data) {
+            const tbody = document.getElementById('studentTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tbody.innerHTML = data.map((s) => `
+                <tr>
+                    <td><div class="avatar" style="background:${getAvatarColor(s.name)}">${s.name.charAt(0).toUpperCase()}</div></td>
+                    <td><code>${s.roll}</code></td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.branch}</td>
+                    <td>${s.year}</td>
+                    <td>${s.marks}/100</td>
+                    <td><span class="grade-badge ${getGradeColor(s.grade)}">${s.grade}</span></td>
+                    <td>
+                        <div class="student-progress-bar">
+                            <div class="student-progress-fill" style="width:${s.marks}%;background:${getProgressColor(s.marks)}"></div>
+                        </div>
+                        <span class="progress-label">${s.marks}%</span>
+                    </td>
+                    <td><span class="status-badge ${s.attendance === 'Present' ? 'present' : 'absent'}" onclick="toggleAttendance(${s.id})">${s.attendance}</span></td>
+                    <td><span class="status-badge ${s.fee === 'Paid' ? 'paid' : 'unpaid'}" onclick="toggleFee(${s.id})">${s.fee}</span></td>
+                    <td>${s.joined}</td>
+                    <td><button class="delete-btn" onclick="deleteStudent(${s.id})">🗑️</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Attendance Table
+        function renderAttendanceTable() {
+            const tbody = document.getElementById('attendanceTableBody');
+            const emptyState = document.getElementById('attEmptyState');
+            const attPresent = document.getElementById('attPresent');
+            const attAbsent = document.getElementById('attAbsent');
+
+            if (students.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                attPresent.textContent = 0;
+                attAbsent.textContent = 0;
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            attPresent.textContent = students.filter(s => s.attendance === 'Present').length;
+            attAbsent.textContent = students.filter(s => s.attendance === 'Absent').length;
+
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td><div class="avatar" style="background:${getAvatarColor(s.name)}">${s.name.charAt(0).toUpperCase()}</div></td>
+                    <td><code>${s.roll}</code></td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.branch}</td>
+                    <td>${s.year}</td>
+                    <td><span class="status-badge ${s.attendance === 'Present' ? 'present' : 'absent'}" onclick="toggleAttendance(${s.id})">${s.attendance}</span></td>
+                    <td>${s.email ? `<span class="email-tag">📧 ${s.email}</span>` : '<span style="color:var(--muted)">No email</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Reports Table
+        function renderReportsTable() {
+            const tbody = document.getElementById('reportsTableBody');
+            const emptyState = document.getElementById('reportsEmptyState');
+
+            if (students.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                document.getElementById('gradeReport').innerHTML = '<p style="color:var(--muted)">No data yet.</p>';
+                document.getElementById('feeReport').innerHTML = '<p style="color:var(--muted)">No data yet.</p>';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Grade Report
+            const grades = ['A+', 'A', 'B+', 'B', 'C', 'D', 'F'];
+            document.getElementById('gradeReport').innerHTML = grades.map(g => {
+                const count = students.filter(s => s.grade === g).length;
+                const percent = Math.round((count / students.length) * 100);
+                return `
+                    <div class="report-row">
+                        <span class="grade-badge ${getGradeColor(g)}">${g}</span>
+                        <div class="report-bar-wrap">
+                            <div class="report-bar" style="width:${percent}%;background:${getProgressColor(percent)}"></div>
+                        </div>
+                        <span class="report-count">${count} students</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Fee Report
+            const paid = students.filter(s => s.fee === 'Paid').length;
+            const unpaid = students.length - paid;
+            const paidPercent = Math.round((paid / students.length) * 100);
+            document.getElementById('feeReport').innerHTML = `
+                <div class="report-row">
+                    <span class="status-badge paid">Paid</span>
+                    <div class="report-bar-wrap">
+                        <div class="report-bar" style="width:${paidPercent}%;background:linear-gradient(90deg,#10b981,#34d399)"></div>
+                    </div>
+                    <span class="report-count">${paid} students</span>
+                </div>
+                <div class="report-row">
+                    <span class="status-badge unpaid">Unpaid</span>
+                    <div class="report-bar-wrap">
+                        <div class="report-bar" style="width:${100 - paidPercent}%;background:linear-gradient(90deg,#ef4444,#f87171)"></div>
+                    </div>
+                    <span class="report-count">${unpaid} students</span>
+                </div>
+            `;
+
+            // Reports Table
+            const sorted = [...students].sort((a, b) => b.marks - a.marks);
+            tbody.innerHTML = sorted.map(s => `
+                <tr>
+                    <td><div class="avatar" style="background:${getAvatarColor(s.name)}">${s.name.charAt(0).toUpperCase()}</div></td>
+                    <td><code>${s.roll}</code></td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.marks}/100</td>
+                    <td><span class="grade-badge ${getGradeColor(s.grade)}">${s.grade}</span></td>
+                    <td>
+                        <div class="student-progress-bar">
+                            <div class="student-progress-fill" style="width:${s.marks}%;background:${getProgressColor(s.marks)}"></div>
+                        </div>
+                        <span class="progress-label">${s.marks}%</span>
+                    </td>
+                    <td><span class="status-badge ${s.fee === 'Paid' ? 'paid' : 'unpaid'}">${s.fee}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Dashboard Summary
+        function updateDashboardSummary() {
+            if (students.length === 0) return;
+            const top = [...students].sort((a, b) => b.marks - a.marks)[0];
+            const defaulters = students.filter(s => s.fee === 'Unpaid');
+            document.getElementById('summaryText').textContent = `${students.length} students enrolled. ${students.filter(s => s.attendance === 'Present').length} present today.`;
+            document.getElementById('topPerformer').textContent = top ? `${top.name} — ${top.marks}/100 (${top.grade})` : 'No data';
+            document.getElementById('feeDefaulters').textContent = defaulters.length > 0 ? defaulters.map(s => s.name).join(', ') : 'All fees paid! ✅';
+        }
+
+        // Update Stats
+        function updateStats() {
+            const total = students.length;
+            const present = students.filter(s => s.attendance === 'Present').length;
+            const absent = total - present;
+            const feePaid = students.filter(s => s.fee === 'Paid').length;
+            const percent = total > 0 ? Math.round((present / total) * 100) : 0;
+
+            document.getElementById('totalStudents').textContent = total;
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+            document.getElementById('feePaidCount').textContent = feePaid;
+            document.getElementById('attendancePercent').textContent = percent + '%';
+            document.getElementById('progressLabel').textContent = percent + '%';
+
+            const fill = document.getElementById('progressBarFill');
+            fill.style.width = percent + '%';
+            fill.style.background = percent >= 75 ? 'linear-gradient(90deg, #10b981, #34d399)' :
+                                    percent >= 50 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' :
+                                    'linear-gradient(90deg, #ef4444, #f87171)';
+
+            updateDashboardSummary();
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.querySelector('.theme-toggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                btn.textContent = '☀️';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.textContent = '🌙';
+            }
+        }
+
+        renderStudentTable(students);
+        updateStats();
+    </script>
+
+</body>
+</html>
